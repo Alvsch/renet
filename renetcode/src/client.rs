@@ -51,7 +51,6 @@ pub enum ClientAuthentication {
 #[derive(Debug)]
 pub struct NetcodeClient {
     state: ClientState,
-    client_id: u64,
     connect_start_time: Duration,
     last_packet_send_time: Option<Duration>,
     last_packet_received_time: Duration,
@@ -112,7 +111,6 @@ impl NetcodeClient {
 
         Ok(Self {
             sequence: 0,
-            client_id: connect_token.client_id,
             server_addr,
             server_addr_index: 0,
             challenge_token_sequence: 0,
@@ -148,10 +146,6 @@ impl NetcodeClient {
 
     pub fn current_time(&self) -> Duration {
         self.current_time
-    }
-
-    pub fn client_id(&self) -> u64 {
-        self.client_id
     }
 
     /// Returns the duration since the client last received a packet.
