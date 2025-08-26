@@ -1,6 +1,6 @@
 use std::{
     error::Error,
-    fmt,
+    fmt::{self, Debug},
     io::{self, Cursor},
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
     time::Duration,
@@ -18,7 +18,7 @@ use chacha20poly1305::aead::Error as CryptoError;
 /// A public connect token that the client receives to start connecting to the server.
 /// How the client receives ConnectToken is up to you, could be from a matchmaking
 /// system or from a call to a REST API as an example.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct ConnectToken {
     pub version_info: [u8; 13],
     pub protocol_id: u64,
@@ -32,7 +32,25 @@ pub struct ConnectToken {
     pub timeout_seconds: i32,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+impl Debug for ConnectToken {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let server_addresses = self.server_addresses.iter().filter_map(|x| x.clone()).collect::<Vec<SocketAddr>>();
+        f.debug_struct("ConnectToken")
+            .field("version_info", &self.version_info)
+            .field("protocol_id", &self.protocol_id)
+            .field("create_timestamp", &self.create_timestamp)
+            .field("expire_timestamp", &self.expire_timestamp)
+            .field("xnonce", &"[...]")
+            .field("server_addresses", &server_addresses)
+            .field("client_to_server_key", &"[...]")
+            .field("server_to_client_key", &"[...]")
+            .field("private_data", &"[...]")
+            .field("timeout_seconds", &self.timeout_seconds)
+            .finish()
+    }
+}
+
+#[derive(PartialEq, Eq)]
 pub(crate) struct PrivateConnectToken {
     pub client_id: u64,       // globally unique identifier for an authenticated client
     pub timeout_seconds: i32, // timeout in seconds. negative values disable timeout (dev only)
@@ -40,6 +58,20 @@ pub(crate) struct PrivateConnectToken {
     pub client_to_server_key: [u8; NETCODE_KEY_BYTES],
     pub server_to_client_key: [u8; NETCODE_KEY_BYTES],
     pub user_data: [u8; NETCODE_USER_DATA_BYTES], // user defined data specific to this protocol id
+}
+
+impl Debug for PrivateConnectToken {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let server_addresses = self.server_addresses.iter().filter_map(|x| x.clone()).collect::<Vec<SocketAddr>>();
+        f.debug_struct("PrivateConnectToken")
+            .field("client_id", &self.client_id)
+            .field("timeout_seconds", &self.timeout_seconds)
+            .field("server_addresses", &server_addresses)
+            .field("client_to_server_key", &"[...]")
+            .field("server_to_client_key", &"[...]")
+            .field("user_data", &self.user_data)
+            .finish()
+    }
 }
 
 #[derive(Debug)]
