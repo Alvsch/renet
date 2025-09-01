@@ -1,3 +1,5 @@
+#[cfg(feature = "actix")]
+mod actix;
 mod channel;
 mod connection_stats;
 mod error;
