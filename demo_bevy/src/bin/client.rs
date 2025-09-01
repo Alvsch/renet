@@ -7,14 +7,16 @@ use bevy::{
     prelude::*,
 };
 use bevy_egui::{EguiContexts, EguiPlugin};
+#[cfg(feature = "netcode")]
+use bevy_renet::client_connected;
 use bevy_renet::{
-    client_connected,
     renet::{ClientId, RenetClient},
     RenetClientPlugin,
 };
-use demo_bevy::{
-    connection_config, setup_level, ClientChannel, NetworkedEntities, PlayerCommand, PlayerInput, ServerChannel, ServerMessages,
-};
+#[cfg(feature = "netcode")]
+use demo_bevy::connection_config;
+
+use demo_bevy::{setup_level, ClientChannel, NetworkedEntities, PlayerCommand, PlayerInput, ServerChannel, ServerMessages};
 use renet_visualizer::{RenetClientVisualizer, RenetVisualizerStyle};
 
 #[derive(Component)]

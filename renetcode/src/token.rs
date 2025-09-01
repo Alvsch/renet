@@ -34,7 +34,7 @@ pub struct ConnectToken {
 
 impl Debug for ConnectToken {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let server_addresses = self.server_addresses.iter().filter_map(|x| x.clone()).collect::<Vec<SocketAddr>>();
+        let server_addresses = self.server_addresses.iter().filter_map(|x| *x).collect::<Vec<SocketAddr>>();
         f.debug_struct("ConnectToken")
             .field("version_info", &self.version_info)
             .field("protocol_id", &self.protocol_id)
@@ -62,7 +62,7 @@ pub(crate) struct PrivateConnectToken {
 
 impl Debug for PrivateConnectToken {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let server_addresses = self.server_addresses.iter().filter_map(|x| x.clone()).collect::<Vec<SocketAddr>>();
+        let server_addresses = self.server_addresses.iter().filter_map(|x| *x).collect::<Vec<SocketAddr>>();
         f.debug_struct("PrivateConnectToken")
             .field("client_id", &self.client_id)
             .field("timeout_seconds", &self.timeout_seconds)
