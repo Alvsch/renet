@@ -62,6 +62,7 @@ enum ChannelOrder {
 }
 
 /// Describes the stats of a connection.
+#[derive(Debug)]
 pub struct NetworkInfo {
     /// Round-trip Time
     pub rtt: f64,
