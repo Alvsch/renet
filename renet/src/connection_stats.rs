@@ -7,6 +7,7 @@ const SIZE: usize = (WINDOW.as_millis() / RESOLUTION.as_millis()) as usize;
 #[derive(Debug, Default)]
 pub struct ConnectionStats {
     packets_sent: [u64; SIZE],
+    packets_received: [u64; SIZE],
     packets_acked: [u64; SIZE],
     bytes_sent: [u64; SIZE],
     bytes_received: [u64; SIZE],
@@ -18,6 +19,7 @@ impl ConnectionStats {
         Self {
             packets_sent: [0; SIZE],
             packets_acked: [0; SIZE],
+            packets_received: [0; SIZE],
             bytes_sent: [0; SIZE],
             bytes_received: [0; SIZE],
             current_index: 0,
@@ -33,6 +35,7 @@ impl ConnectionStats {
         if self.current_index != i {
             self.current_index = i;
             self.packets_sent[i] = 0;
+            self.packets_received[i] = 0;
             self.bytes_sent[i] = 0;
             self.bytes_received[i] = 0;
             self.packets_acked[i] = 0;
@@ -45,6 +48,7 @@ impl ConnectionStats {
     }
 
     pub fn received_packet(&mut self, bytes: u64) {
+        self.packets_received[self.current_index] += 1;
         self.bytes_received[self.current_index] += bytes;
     }
 
@@ -81,6 +85,26 @@ impl ConnectionStats {
         // Ignore the current incomplete resolution
         total_bytes -= self.bytes_received[self.current_index];
         total_bytes as f64 / (WINDOW - RESOLUTION).as_secs_f64()
+    }
+
+    pub fn packets_sent_per_second(&self, current_time: Duration) -> f64 {
+        let mut total_packets_sent: u64 = self.packets_sent.iter().sum();
+        if current_time < WINDOW {
+            return total_packets_sent as f64 / current_time.as_secs_f64();
+        }
+
+        total_packets_sent -= self.packets_sent[self.current_index];
+        total_packets_sent as f64 / (WINDOW - RESOLUTION).as_secs_f64()
+    }
+
+    pub fn packets_received_per_second(&self, current_time: Duration) -> f64 {
+        let mut total_packets_received: u64 = self.packets_received.iter().sum();
+        if current_time < WINDOW {
+            return total_packets_received as f64 / current_time.as_secs_f64();
+        }
+
+        total_packets_received -= self.packets_received[self.current_index];
+        total_packets_received as f64 / (WINDOW - RESOLUTION).as_secs_f64()
     }
 
     pub fn packet_loss(&self) -> f64 {

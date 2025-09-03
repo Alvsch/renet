@@ -69,6 +69,8 @@ pub struct NetworkInfo {
     pub packet_loss: f64,
     pub bytes_sent_per_second: f64,
     pub bytes_received_per_second: f64,
+    pub packets_sent_per_second: f64,
+    pub packets_received_per_second: f64,
 }
 
 /// The connection status of a [`RenetClient`].
@@ -220,6 +222,8 @@ impl RenetClient {
             packet_loss: self.stats.packet_loss(),
             bytes_sent_per_second: self.stats.bytes_sent_per_second(self.current_time),
             bytes_received_per_second: self.stats.bytes_received_per_second(self.current_time),
+            packets_sent_per_second: self.stats.packets_sent_per_second(self.current_time),
+            packets_received_per_second: self.stats.packets_received_per_second(self.current_time),
         }
     }
 
